@@ -18,6 +18,19 @@ jobs:
           pip install --no-deps --target vendor kivy_garden.mapview || true
           if [ -d vendor/kivy_garden ]; then cp -r vendor/kivy_garden ./; fi
 
+      - name: Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Залежності
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git zip unzip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev automake
+          pip install --upgrade pip
+          pip install --upgrade buildozer "cython==0.29.36"
+
       - name: Кеш Buildozer
         uses: actions/cache@v4
         with:
@@ -27,14 +40,10 @@ jobs:
           key: buildozer-${{ hashFiles('buildozer.spec') }}
 
       - name: Збірка APK
-        id: buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
-        with:
-          workdir: .
-          command: buildozer android debug
+        run: buildozer -v android debug
 
       - name: Завантажити APK
         uses: actions/upload-artifact@v4
         with:
           name: tito-air-alert-apk
-          path: ${{ steps.buildozer.outputs.filename }}
+          path: bin/*.apk
