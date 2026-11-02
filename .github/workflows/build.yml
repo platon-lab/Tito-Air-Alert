@@ -1,1 +1,40 @@
+name: Build APK
 
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    steps:
+      - name: Код
+        uses: actions/checkout@v4
+
+      - name: Підтягнути MapView (необов'язково)
+        run: |
+          pip install --no-deps --target vendor kivy_garden.mapview || true
+          if [ -d vendor/kivy_garden ]; then cp -r vendor/kivy_garden ./; fi
+
+      - name: Кеш Buildozer
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.buildozer
+            .buildozer
+          key: buildozer-${{ hashFiles('buildozer.spec') }}
+
+      - name: Збірка APK
+        id: buildozer
+        uses: ArtemSBulgakov/buildozer-action@v1
+        with:
+          workdir: .
+          command: buildozer android debug
+
+      - name: Завантажити APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: tito-air-alert-apk
+          path: ${{ steps.buildozer.outputs.filename }}
