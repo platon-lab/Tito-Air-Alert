@@ -9,10 +9,12 @@ version = 1.0.0
 
 requirements = python3,kivy==2.3.0,pyjnius,android
 
+# Закрепляем python-for-android, чтобы собиралась совместимая версия Python (3.11)
+p4a.branch = v2024.01.21
+
 orientation = portrait
 fullscreen = 0
 
-# Фоновий сервіс: клас буде org.tito.airalert.ServiceAlertmonitor
 services = alertmonitor:service.py:foreground
 
 android.permissions = INTERNET,SYSTEM_ALERT_WINDOW,FOREGROUND_SERVICE,WAKE_LOCK,POST_NOTIFICATIONS,MODIFY_AUDIO_SETTINGS
